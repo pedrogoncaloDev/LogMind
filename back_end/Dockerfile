@@ -12,7 +12,7 @@ RUN useradd -m appuser
 USER appuser 
 
 # Em desenvolvimento
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
 
 # Em produção
 # CMD ["gunicorn", "main:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:5000"]
