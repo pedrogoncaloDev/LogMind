@@ -1,17 +1,7 @@
 from sqlalchemy import create_engine
-
-from app.core.config import settings
-
-DATABASE_URL = (
-    f"postgresql://"
-    f"{settings.DB_USER}:"
-    f"{settings.DB_PASSWORD}@"
-    f"{settings.DB_HOST}:"
-    f"{settings.DB_PORT}/"
-    f"{settings.DB_NAME}"
-)
+from app.core.config import DATABASE_URL
 
 engine = create_engine(
     DATABASE_URL,
-    echo=settings.DEBUG
+    echo=True
 )
