@@ -1,6 +1,9 @@
-Gerar versão do banco
+### Gerar versão do banco
+```
 alembic revision --autogenerate -m "initial migration"
+```
 
-
-Aplicar uma migration
+### Aplicar uma migration
+```
 alembic upgrade head
+```
