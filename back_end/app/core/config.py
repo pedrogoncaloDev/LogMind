@@ -22,7 +22,7 @@ class Settings(BaseSettings):
         return (
             f"postgresql+psycopg://"
             f"{self.DB_USER}:{self.DB_PASSWORD}"
-            f"@localhost:{self.DB_PORT}"
+            f"@{self.DB_HOST}:{self.DB_PORT}"
             f"/{self.DB_NAME}"
         )
 
