@@ -1,33 +1,3 @@
-# from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-# class Settings(BaseSettings):
-#     DB_NAME: str
-#     DB_USER: str
-#     DB_PASSWORD: str
-#     DB_PORT: int
-#     DB_HOST: str = "localhost"
-
-#     DEBUG: bool = False
-#     API_URL: str
-
-#     model_config = SettingsConfigDict(
-#         env_file=".env",
-#         extra="ignore"
-#     )
-
-#     @property
-#     def database_url(self) -> str:
-#         return(
-#             f"postgresql+psycopg2://"
-#             f"{self.DB_USER}:{self.DB_PASSWORD}"
-#             f"@{self.DB_HOST}:{self.DB_PORT}"
-#             f"/{self.DB_NAME}"
-#         )
-
-# settings = Settings()
-
-
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
