@@ -1,6 +1,6 @@
 ### Gerar versão do banco
 ```
-alembic revision --autogenerate -m "initial migration"
+alembic revision --autogenerate -m "message"
 ```
 
 ### Aplicar uma migration
