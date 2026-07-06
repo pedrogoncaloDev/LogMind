@@ -1,6 +1,15 @@
+import sys
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+
+BACK_END_ROOT = Path(__file__).resolve().parent.parent
+if str(BACK_END_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACK_END_ROOT))
+
+from app.routers.user_routes import router as user_router
 
 app = FastAPI(
 	title="LogMind API",
@@ -34,6 +43,11 @@ async def health_check():
 	return {
 		"status": "healthy"
 	}
+
+# Rotas
+# POST /users -> criar usuário
+app.include_router(user_router, prefix="/users", tags=["users"])
+
 
 if __name__ == "__main__":
     uvicorn.run(
