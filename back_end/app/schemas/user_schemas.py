@@ -1,10 +1,11 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
+from uuid import UUID
 
 class UserCreate(BaseModel):
 	name: str = Field(..., min_length=1)
 	email: EmailStr
-	password_hash: str = Field(..., min_length=8)
+	password: str = Field(..., min_length=8)
 	is_active: bool = True
 	created_at: datetime = Field(
 		default_factory=datetime.now,
@@ -17,7 +18,7 @@ class UserCreate(BaseModel):
 
 
 class UserResponse(BaseModel):
-	id: int
+	id: UUID
 	name: str = Field(..., min_length=1)
 	email: EmailStr
 	password_hash: str = Field(..., min_length=8)

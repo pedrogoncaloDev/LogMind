@@ -28,7 +28,7 @@ def create_user(user_data: UserCreate) -> UserResponse:
 				password = user_data.password
 				is_active = user_data.is_active
 			
-			existing_user = find_by_email(database_session, user_data.email)
+			existing_user = find_by_email(database_session, email)
 			if existing_user:
 				raise ValueError("Já existe um usuário com este e-mail.")
 
