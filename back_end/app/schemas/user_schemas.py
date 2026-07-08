@@ -1,11 +1,25 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic_core import PydanticCustomError 
 from uuid import UUID
 
-class UserCreate(BaseModel):
+
+class PasswordMixin(BaseModel):
+    password: str = Field(...)
+
+    @field_validator("password", mode="before")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if len(value) < 8:
+            raise PydanticCustomError(
+                "password.too_short",
+                "A senha deve ter pelo menos 8 caracteres."
+            )
+        return value
+
+class UserCreate(PasswordMixin, BaseModel):
 	name: str = Field(..., min_length=1)
 	email: EmailStr
-	password: str = Field(..., min_length=8)
 	is_active: bool = True
 	created_at: datetime = Field(
 		default_factory=datetime.now,
@@ -21,13 +35,12 @@ class UserResponse(BaseModel):
 	id: UUID
 	name: str = Field(..., min_length=1)
 	email: EmailStr
-	password_hash: str = Field(..., min_length=8)
 	is_active: bool = True
 	updated_at: str = Field(..., description="Data de atualização do usuário")
 
 	class Config:
 		from_attributes = True
 
-class LoginRequest(BaseModel):
-	email: EmailStr
-	password: str = Field(..., min_length=8)		
+
+class LoginRequest(PasswordMixin, BaseModel):
+	email: EmailStr	
