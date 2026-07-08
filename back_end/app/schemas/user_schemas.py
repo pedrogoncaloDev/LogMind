@@ -17,30 +17,41 @@ class PasswordMixin(BaseModel):
             )
         return value
 
-class UserCreate(PasswordMixin, BaseModel):
-	name: str = Field(..., min_length=1)
-	email: EmailStr
-	is_active: bool = True
-	created_at: datetime = Field(
-		default_factory=datetime.now,
-		description="Data de criação do usuário"
-	)
-	updated_at: datetime = Field(
-		default_factory=datetime.now,
-		description="Data de atualização do usuário"
-	)
+
+class UserCreate(PasswordMixin):
+    name: str = Field(..., min_length=1)
+    email: EmailStr
+    is_active: bool = True
+    created_at: datetime = Field(
+        default_factory=datetime.now,
+        description="Data de criação do usuário"
+    )
+    updated_at: datetime = Field(
+        default_factory=datetime.now,
+        description="Data de atualização do usuário"
+    )
 
 
 class UserResponse(BaseModel):
-	id: UUID
-	name: str = Field(..., min_length=1)
-	email: EmailStr
-	is_active: bool = True
-	updated_at: str = Field(..., description="Data de atualização do usuário")
+    id: UUID
+    name: str = Field(..., min_length=1)
+    email: EmailStr
+    is_active: bool = True
+    updated_at: str = Field(..., description="Data de atualização do usuário")
 
-	class Config:
-		from_attributes = True
+    class Config:
+        from_attributes = True
 
 
-class LoginRequest(PasswordMixin, BaseModel):
-	email: EmailStr	
+class LoginRequest(PasswordMixin):
+    email: EmailStr
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str

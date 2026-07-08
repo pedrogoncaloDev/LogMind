@@ -3,7 +3,7 @@ from app.schemas.user_schemas import UserResponse, UserCreate
 from app.models.user import User
 from app.core.security import hash_password
 
-def find_by_email(email: str, database_session=None):
+def find_by_email(database_session=None, email: str = ''):
 	try:
 		if database_session is None:
 			with SessionLocal() as database_session:

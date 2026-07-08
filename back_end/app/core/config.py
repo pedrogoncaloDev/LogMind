@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_HOST: str = "localhost"
     API_URL: str
+    SECRET_KEY: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
