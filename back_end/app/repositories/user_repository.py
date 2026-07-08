@@ -3,13 +3,21 @@ from app.schemas.user_schemas import UserResponse, UserCreate
 from app.models.user import User
 from app.core.security import hash_password
 
-def find_by_email(database_session, email: str):
+def find_by_email(email: str, database_session=None):
 	try:
+		if database_session is None:
+			with SessionLocal() as database_session:
+				return (
+						database_session.query(User)
+							.filter(User.email == email)
+							.first()
+						)
+		
 		return (
-			database_session.query(User)
-			.filter(User.email == email)
-			.first()
-		)
+				database_session.query(User)
+						.filter(User.email == email)
+						.first()
+				)
 	except Exception as e:
 		raise e
 
