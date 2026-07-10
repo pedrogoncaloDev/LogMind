@@ -1,8 +1,11 @@
 from sqlalchemy.orm import sessionmaker
-
 from app.database.connection import engine
 from app.database.base import Base
-from app.models import log_file, user, analysis, analysis_error
+from app.domains.users.model import User
+from app.domains.log_files.model import LogFile
+from app.domains.analysis.model import Analysis
+from app.domains.analysis_error.model import AnalysisError
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
