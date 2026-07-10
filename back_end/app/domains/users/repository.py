@@ -1,7 +1,7 @@
 from app.database.session import SessionLocal
-from app.schemas.user_schemas import UserResponse, UserCreate
-from app.models.user import User
 from app.core.security import hash_password
+from .schema import UserResponse, UserCreate
+from .model import User
 
 def find_by_email(database_session=None, email: str = ''):
 	try:

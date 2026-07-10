@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.schemas.user_schemas import UserCreate, UserResponse, LoginRequest, TokenResponse, RefreshTokenRequest
-from app.services import user_service
+from app.domains.users import service as user_service
+from .schema import UserCreate, UserResponse, LoginRequest, TokenResponse, RefreshTokenRequest
 
 router = APIRouter()
 
@@ -29,7 +29,7 @@ def create_user(user: UserCreate):
 
 
 @router.post(
-    "/token",
+    "/login",
     response_model=TokenResponse,
     summary="Login de usuário",
     description="Autentica o usuário e retorna access_token e refresh_token",
