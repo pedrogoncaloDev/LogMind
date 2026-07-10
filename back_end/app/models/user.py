@@ -17,4 +17,5 @@ class User(Base):
 	password_hash = Column(Text, nullable=False)
 	is_active = Column(Boolean, default=True, nullable=False)
 	created_at = Column(DateTime, server_default=func.now(), nullable=False)
+	updated_at = Column(DateTime, server_default=func.now(), nullable=False)
 

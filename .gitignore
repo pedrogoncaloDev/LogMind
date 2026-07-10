@@ -30,9 +30,6 @@ env/
 # IDEs
 # =========================
 
-# VSCode
-.vscode/
-
 # PyCharm
 .idea/
 
