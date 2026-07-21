@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: FastAPI (uvicorn)",
+            "name": "Python: FastAPI (local, sem Docker)",
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
@@ -20,6 +20,22 @@
                 "PYTHONPATH": "${workspaceFolder}/back_end"
             },
             "cwd": "${workspaceFolder}/back_end"
+        },
+        {
+            "name": "Python: Attach ao container (Docker)",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/back_end",
+                    "remoteRoot": "/app"
+                }
+            ],
+            "justMyCode": true
         }
     ]
 }
