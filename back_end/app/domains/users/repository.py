@@ -12,10 +12,29 @@ def find_by_email(database_session=None, email: str = ''):
 							.filter(User.email == email)
 							.first()
 						)
-		
+
 		return (
 				database_session.query(User)
 						.filter(User.email == email)
+						.first()
+				)
+	except Exception as e:
+		raise e
+
+
+def find_by_id(database_session=None, user_id: str = ''):
+	try:
+		if database_session is None:
+			with SessionLocal() as database_session:
+				return (
+						database_session.query(User)
+							.filter(User.id == user_id)
+							.first()
+						)
+
+		return (
+				database_session.query(User)
+						.filter(User.id == user_id)
 						.first()
 				)
 	except Exception as e:

@@ -1,26 +1,34 @@
 from pathlib import Path
 from fastapi import UploadFile, HTTPException
 from app.infrastructure.storage.local_storage import LocalStorage
+from app.domains.users.model import User
+from . import repository as log_file_repository
 
 MAX_SIZE = 5 * 1024 * 1024
 
 class LogFileService:
 
 	@staticmethod
-	async def upload(file: UploadFile):
+	async def upload(file: UploadFile, current_user: User):
 
 		LogFileService.validate_file_extension(file)
 
 		content = await file.read()
 
-		LogFileService.validate_file_size(file)
+		LogFileService.validate_file_size(content)
 
-		result = await LocalStorage.upload(
+		storage_result = await LocalStorage.upload(
 			file=file,
 			content=content
 		)
 
-		return result
+		return log_file_repository.create_log_file(
+			user_id=current_user.id,
+			original_filename=storage_result["original_filename"],
+			stored_filename=storage_result["stored_filename"],
+			file_size=storage_result["file_size"],
+		)
+
 
 	@staticmethod
 	def validate_file_extension(file: UploadFile):
@@ -32,8 +40,9 @@ class LogFileService:
 				detail="Apenas arquivos .log são permitidos"
 			)
 
+
 	@staticmethod
-	async def validate_file_size(content: bytes):
+	def validate_file_size(content: bytes):
 		if len(content) > MAX_SIZE:
 			raise HTTPException(
 				status_code=400,

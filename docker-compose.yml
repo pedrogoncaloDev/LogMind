@@ -42,9 +42,13 @@ services:
       - "5000:5000"
       - "5678:5678"
 
+    volumes:
+      - uploads_data:/app/storage/uploads
+
     depends_on:
       postgres:
         condition: service_healthy
 
 volumes:
   postgres_data:
+  uploads_data:

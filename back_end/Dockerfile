@@ -9,7 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN useradd -m appuser
-USER appuser 
+RUN mkdir -p /app/storage/uploads && chown -R appuser:appuser /app/storage
+USER appuser
 
 # Em desenvolvimento: se DEBUG_MODE=true, sobe com debugpy escutando na porta 5678
 # para o VS Code conectar (attach) e permitir breakpoints dentro do container.
