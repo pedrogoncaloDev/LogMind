@@ -1,3 +1,5 @@
+import uuid
+
 from app.database.session import SessionLocal
 from app.core.security import hash_password
 from .schema import UserResponse, UserCreate
@@ -24,17 +26,22 @@ def find_by_email(database_session=None, email: str = ''):
 
 def find_by_id(database_session=None, user_id: str = ''):
 	try:
+		user_uuid = uuid.UUID(str(user_id))
+	except (ValueError, AttributeError, TypeError):
+		return None
+
+	try:
 		if database_session is None:
 			with SessionLocal() as database_session:
 				return (
 						database_session.query(User)
-							.filter(User.id == user_id)
+							.filter(User.id == user_uuid)
 							.first()
 						)
 
 		return (
 				database_session.query(User)
-						.filter(User.id == user_id)
+						.filter(User.id == user_uuid)
 						.first()
 				)
 	except Exception as e:
