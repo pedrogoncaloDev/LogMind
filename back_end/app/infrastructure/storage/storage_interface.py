@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 
+
 class StorageInterface(ABC):
-    
+
+    @staticmethod
     @abstractmethod
-    async def upload(self, file):
+    async def upload(file, content: bytes) -> dict:
         pass
