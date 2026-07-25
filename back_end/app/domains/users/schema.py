@@ -1,6 +1,6 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, field_validator
-from pydantic_core import PydanticCustomError 
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic_core import PydanticCustomError
 from uuid import UUID
 
 
@@ -39,35 +39,36 @@ class UserResponse(BaseModel):
     is_active: bool = True
     updated_at: str = Field(..., description="Data de atualização do usuário")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LoginRequest(PasswordMixin):
-    email: EmailStr = Field(..., example="user@example.com")
-    
-    class Config:
-        json_schema_extra = {
+    email: EmailStr
+
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "email": "user@example.com",
                 "password": "senha123456"
             }
         }
+    )
 
 
 class TokenResponse(BaseModel):
-    access_token: str = Field(..., example="eyJhbGc...")
-    token_type: str = Field(default="bearer", example="bearer")
-    refresh_token: str = Field(..., example="eyJhbGc...")
-    
-    class Config:
-        json_schema_extra = {
+    access_token: str
+    token_type: str = Field(default="bearer")
+    refresh_token: str
+
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "token_type": "bearer",
                 "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
             }
         }
+    )
 
 
 class RefreshTokenRequest(BaseModel):
