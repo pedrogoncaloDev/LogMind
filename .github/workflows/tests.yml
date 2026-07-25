@@ -35,5 +35,5 @@ jobs:
           DB_PORT: 5432
           DB_HOST: localhost
           API_URL: http://localhost:5000
-          SECRET_KEY: ci-secret-key-for-tests-only
+          SECRET_KEY: ci-secret-key-for-tests-only-32chars
         run: pytest
