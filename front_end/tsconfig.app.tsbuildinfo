@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/vite-env.d.ts","./src/router/index.ts","./src/services/authservice.ts","./src/services/httpclient.ts","./src/stores/auth.ts","./src/types/auth.ts","./src/app.vue","./src/components/basebutton.vue","./src/components/baseinput.vue","./src/components/basepasswordinput.vue","./src/views/loginview.vue"],"version":"5.7.3"}
