@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ChatSidebar from '@/components/ChatSidebar.vue'
 import ChatMessageItem from '@/components/ChatMessageItem.vue'
+import BrandMark from '@/components/BrandMark.vue'
 import PromptInput from '@/components/PromptInput.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
@@ -20,10 +21,25 @@ if (authStore.user) {
 	router.replace('/login')
 }
 
-const SUGGESTIONS = [
-	'Explique o que significa este erro: ',
-	'Resuma os principais warnings deste log: ',
-	'Como investigar picos de latência nos logs?',
+const STARTERS = [
+	{
+		level: 'ERROR',
+		title: 'Explicar um erro',
+		description: 'Cole a mensagem ou o stack trace.',
+		prompt: 'Explique o que significa este erro e qual a causa provável:\n',
+	},
+	{
+		level: 'WARN',
+		title: 'Resumir warnings',
+		description: 'Veja o que merece atenção no log.',
+		prompt: 'Resuma os principais warnings deste log:\n',
+	},
+	{
+		level: 'INFO',
+		title: 'Investigar lentidão',
+		description: 'Procure picos de latência.',
+		prompt: 'Como investigar picos de latência nestes logs?\n',
+	},
 ]
 
 const draft = ref('')
@@ -107,14 +123,19 @@ function handleLogout() {
 			</header>
 
 			<div ref="scroller" class="chat-main__scroll">
-				<section v-if="!chat" class="empty">
-					<p class="empty__mark" aria-hidden="true">&gt;_</p>
-					<h2 class="empty__title">O que vamos analisar hoje?</h2>
-					<p class="empty__text">Escreva um prompt abaixo para começar uma nova conversa.</p>
-					<div class="empty__suggestions">
-						<button v-for="suggestion in SUGGESTIONS" :key="suggestion" type="button" class="empty__chip"
-							@click="useSuggestion(suggestion)">
-							{{ suggestion.trim() }}
+				<section v-if="!chat" class="welcome">
+					<BrandMark :size="48" />
+					<h2 class="welcome__title">Analise seus logs com I.A.</h2>
+					<p class="welcome__text">
+						Descreva o problema ou cole um trecho de log. Para começar, escolha um exemplo:
+					</p>
+
+					<div class="welcome__cards">
+						<button v-for="starter in STARTERS" :key="starter.title" type="button" class="starter"
+							:class="`starter--${starter.level.toLowerCase()}`" @click="useSuggestion(starter.prompt)">
+							<span class="starter__level">{{ starter.level }}</span>
+							<strong class="starter__title">{{ starter.title }}</strong>
+							<span class="starter__desc">{{ starter.description }}</span>
 						</button>
 					</div>
 				</section>
@@ -123,9 +144,11 @@ function handleLogout() {
 					<ChatMessageItem v-for="message in chat.messages" :key="message.id" :message="message" />
 
 					<div v-if="isWaitingReply" class="thinking" role="status">
-						<span class="thinking__marker" aria-hidden="true">●</span>
-						<span class="thinking__dots" aria-hidden="true"><i /><i /><i /></span>
-						<span class="thinking__sr">LogMind está respondendo…</span>
+						<BrandMark :size="28" />
+						<div class="thinking__card" aria-hidden="true">
+							<i /><i /><i />
+						</div>
+						<span class="thinking__sr">LogMind está analisando…</span>
 					</div>
 				</section>
 			</div>
@@ -162,7 +185,7 @@ function handleLogout() {
 	display: none;
 	padding: 0.25rem 0.55rem;
 	border: 1px solid var(--border);
-	border-radius: 8px;
+	border-radius: var(--radius-sm);
 	background: none;
 	font-size: 1.1rem;
 	line-height: 1.2;
@@ -184,10 +207,8 @@ function handleLogout() {
 }
 
 .chat-main__footer {
-	width: 100%;
-	max-width: 800px;
-	margin: 0 auto;
-	padding: 0.5rem 1.25rem 1rem;
+	padding: 0.85rem 1.25rem 1rem;
+	border-top: 1px solid var(--border);
 }
 
 .messages {
@@ -195,89 +216,121 @@ function handleLogout() {
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
-	gap: 1.5rem;
+	gap: 1.25rem;
 }
 
-.empty {
-	max-width: 560px;
+.welcome {
+	max-width: 720px;
 	min-height: 100%;
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: center;
 	gap: 0.6rem;
-	text-align: center;
 }
 
-.empty__mark {
-	font-family: var(--font-mono);
-	font-size: 2rem;
-	font-weight: 700;
-	color: var(--accent);
+.welcome__title {
+	margin-top: 0.4rem;
+	font-size: 1.9rem;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
 }
 
-.empty__title {
-	font-size: 1.6rem;
-	line-height: 1.2;
-}
-
-.empty__text {
+.welcome__text {
 	color: var(--muted);
 }
 
-.empty__suggestions {
-	margin-top: 1rem;
+.welcome__cards {
+	width: 100%;
+	margin-top: 1.1rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 0.75rem;
+}
+
+.starter {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 0.5rem;
-}
-
-.empty__chip {
-	padding: 0.45rem 0.85rem;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+	padding: 0.85rem 1rem;
+	text-align: left;
 	border: 1px solid var(--border);
-	border-radius: 999px;
+	border-radius: var(--radius-lg);
 	background-color: var(--surface);
-	font-size: 0.85rem;
-	transition: background-color 0.15s ease;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.empty__chip:hover {
+.starter:hover {
+	border-color: var(--accent);
 	background-color: var(--accent-soft);
+}
+
+.starter__level {
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.starter--error .starter__level {
+	color: var(--danger);
+}
+
+.starter--warn .starter__level {
+	color: #b7791f;
+}
+
+.starter--info .starter__level {
+	color: var(--accent);
+}
+
+.starter__title {
+	font-size: 0.95rem;
+}
+
+.starter__desc {
+	font-size: 0.82rem;
+	color: var(--muted);
 }
 
 .thinking {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 0.75rem;
 }
 
-.thinking__marker {
-	width: 1.25rem;
-	font-family: var(--font-mono);
-	font-weight: 700;
-	color: var(--accent);
+.thinking__card {
+	width: min(100%, 280px);
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.85rem 0.95rem;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	border-top-left-radius: var(--radius-sm);
+	background-color: var(--surface);
 }
 
-.thinking__dots {
-	display: inline-flex;
-	gap: 4px;
+.thinking__card i {
+	height: 8px;
+	border-radius: 4px;
+	background-color: var(--border);
+	animation: thinking-pulse 1.2s ease-in-out infinite;
 }
 
-.thinking__dots i {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background-color: var(--muted);
-	animation: thinking-bounce 1s ease-in-out infinite;
+.thinking__card i:nth-child(1) {
+	width: 100%;
 }
 
-.thinking__dots i:nth-child(2) {
+.thinking__card i:nth-child(2) {
+	width: 78%;
 	animation-delay: 0.15s;
 }
 
-.thinking__dots i:nth-child(3) {
+.thinking__card i:nth-child(3) {
+	width: 52%;
 	animation-delay: 0.3s;
 }
 
@@ -289,18 +342,15 @@ function handleLogout() {
 	clip: rect(0 0 0 0);
 }
 
-@keyframes thinking-bounce {
+@keyframes thinking-pulse {
 
 	0%,
-	80%,
 	100% {
-		opacity: 0.3;
-		transform: translateY(0);
+		opacity: 0.45;
 	}
 
-	40% {
+	50% {
 		opacity: 1;
-		transform: translateY(-3px);
 	}
 }
 
@@ -311,9 +361,9 @@ function handleLogout() {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.thinking__dots i {
+	.thinking__card i {
 		animation: none;
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 }
 </style>

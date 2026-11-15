@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import BrandMark from './BrandMark.vue'
 import type { Chat } from '@/types/chat'
 
-defineProps<{
+const props = defineProps<{
 	chats: Chat[]
 	activeChatId?: string
 	userEmail: string
@@ -16,6 +18,31 @@ const emit = defineEmits<{
 	close: []
 }>()
 
+const DAY_MS = 86_400_000
+
+function startOfDay(date: Date): number {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+}
+
+/** Agrupa os chats (já ordenados do mais recente) por data da última atividade. */
+const groups = computed(() => {
+	const buckets: { label: string; chats: Chat[] }[] = [
+		{ label: 'Hoje', chats: [] },
+		{ label: 'Ontem', chats: [] },
+		{ label: 'Últimos 7 dias', chats: [] },
+		{ label: 'Mais antigos', chats: [] },
+	]
+	const today = startOfDay(new Date())
+
+	for (const chat of props.chats) {
+		const days = Math.round((today - startOfDay(new Date(chat.updatedAt))) / DAY_MS)
+		const index = days <= 0 ? 0 : days === 1 ? 1 : days <= 7 ? 2 : 3
+		buckets[index].chats.push(chat)
+	}
+
+	return buckets.filter((bucket) => bucket.chats.length > 0)
+})
+
 function confirmDelete(chat: Chat) {
 	if (window.confirm(`Excluir o chat "${chat.title}"?`)) emit('deleteChat', chat.id)
 }
@@ -26,7 +53,9 @@ function confirmDelete(chat: Chat) {
 
 	<aside class="sidebar" :class="{ 'sidebar--open': open }" aria-label="Seus chats">
 		<header class="sidebar__header">
-			<p class="sidebar__brand"><span class="sidebar__prompt">&gt;</span> LogMind</p>
+			<p class="sidebar__brand">
+				<BrandMark :size="26" /> LogMind
+			</p>
 			<button type="button" class="sidebar__new" @click="emit('newChat')">
 				<span aria-hidden="true">+</span> Novo chat
 			</button>
@@ -35,19 +64,25 @@ function confirmDelete(chat: Chat) {
 		<nav class="sidebar__list" aria-label="Histórico de chats">
 			<p v-if="chats.length === 0" class="sidebar__empty">Nenhum chat ainda.</p>
 
-			<ul v-else>
-				<li v-for="chat in chats" :key="chat.id" class="sidebar__item">
-					<RouterLink :to="`/chat/${chat.id}`" class="sidebar__link"
-						:class="{ 'sidebar__link--active': chat.id === activeChatId }" :title="chat.title"
-						@click="emit('close')">
-						{{ chat.title }}
-					</RouterLink>
-					<button type="button" class="sidebar__delete" :aria-label="`Excluir o chat ${chat.title}`"
-						@click="confirmDelete(chat)">
-						×
-					</button>
-				</li>
-			</ul>
+			<template v-else>
+				<section v-for="group in groups" :key="group.label" class="sidebar__group">
+					<h2 class="sidebar__group-title">{{ group.label }}</h2>
+
+					<ul>
+						<li v-for="chat in group.chats" :key="chat.id" class="sidebar__item">
+							<RouterLink :to="`/chat/${chat.id}`" class="sidebar__link"
+								:class="{ 'sidebar__link--active': chat.id === activeChatId }" :title="chat.title"
+								@click="emit('close')">
+								{{ chat.title }}
+							</RouterLink>
+							<button type="button" class="sidebar__delete" :aria-label="`Excluir o chat ${chat.title}`"
+								@click="confirmDelete(chat)">
+								×
+							</button>
+						</li>
+					</ul>
+				</section>
+			</template>
 		</nav>
 
 		<footer class="sidebar__footer">
@@ -59,7 +94,7 @@ function confirmDelete(chat: Chat) {
 
 <style scoped>
 .sidebar {
-	width: 280px;
+	width: 272px;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
@@ -70,40 +105,41 @@ function confirmDelete(chat: Chat) {
 .sidebar__header {
 	display: flex;
 	flex-direction: column;
-	gap: 0.9rem;
-	padding: 1rem 0.9rem 0.75rem;
+	gap: 1rem;
+	padding: 1.1rem 0.9rem 0.9rem;
 }
 
 .sidebar__brand {
-	font-family: var(--font-mono);
-	font-weight: 600;
-	padding-left: 0.25rem;
-}
-
-.sidebar__prompt {
-	color: var(--accent);
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	padding-left: 0.1rem;
+	font-size: 1.05rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
 }
 
 .sidebar__new {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 0.5rem;
-	padding: 0.55rem 0.75rem;
-	border: 1px solid var(--border);
+	padding: 0.6rem 0.75rem;
+	border: none;
 	border-radius: var(--radius);
-	background-color: var(--surface);
+	background-color: var(--accent);
+	color: var(--accent-contrast);
 	font-weight: 600;
 	font-size: 0.9rem;
 	transition: background-color 0.15s ease;
 }
 
 .sidebar__new:hover {
-	background-color: var(--surface-hover);
+	background-color: var(--accent-hover);
 }
 
 .sidebar__new span {
-	color: var(--accent);
-	font-size: 1.1rem;
+	font-size: 1.15rem;
 	line-height: 1;
 }
 
@@ -111,20 +147,34 @@ function confirmDelete(chat: Chat) {
 	flex: 1;
 	min-height: 0;
 	overflow-y: auto;
-	padding: 0.25rem 0.5rem;
-}
-
-.sidebar__list ul {
-	list-style: none;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
+	padding: 0.25rem 0.5rem 0.75rem;
 }
 
 .sidebar__empty {
 	padding: 0.75rem;
 	font-size: 0.85rem;
 	color: var(--muted);
+}
+
+.sidebar__group+.sidebar__group {
+	margin-top: 1rem;
+}
+
+.sidebar__group-title {
+	padding: 0.25rem 0.75rem;
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--muted);
+}
+
+.sidebar__group ul {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
 }
 
 .sidebar__item {
@@ -137,8 +187,8 @@ function confirmDelete(chat: Chat) {
 	flex: 1;
 	min-width: 0;
 	padding: 0.5rem 2rem 0.5rem 0.75rem;
-	border-radius: 8px;
-	font-size: 0.9rem;
+	border-radius: var(--radius-sm);
+	font-size: 0.88rem;
 	color: var(--text);
 	text-decoration: none;
 	white-space: nowrap;
@@ -150,9 +200,11 @@ function confirmDelete(chat: Chat) {
 	background-color: var(--sidebar-hover);
 }
 
+/* Item ativo marcado por uma barra lateral na cor da marca. */
 .sidebar__link--active,
 .sidebar__link--active:hover {
-	background-color: var(--sidebar-active);
+	background-color: var(--sidebar-hover);
+	box-shadow: inset 3px 0 0 var(--accent);
 	font-weight: 600;
 }
 
@@ -165,7 +217,7 @@ function confirmDelete(chat: Chat) {
 	align-items: center;
 	justify-content: center;
 	border: none;
-	border-radius: 6px;
+	border-radius: var(--radius-sm);
 	background: none;
 	color: var(--muted);
 	font-size: 1.1rem;
@@ -204,9 +256,9 @@ function confirmDelete(chat: Chat) {
 
 .sidebar__logout {
 	flex-shrink: 0;
-	padding: 0.3rem 0.6rem;
+	padding: 0.3rem 0.65rem;
 	border: 1px solid var(--border);
-	border-radius: 8px;
+	border-radius: var(--radius-sm);
 	background: none;
 	font-size: 0.8rem;
 	font-weight: 600;
