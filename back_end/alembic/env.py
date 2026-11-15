@@ -7,7 +7,7 @@ from alembic import context
 from dotenv import load_dotenv
 
 from app.database.base import Base
-import back_end.app.domains
+import app.domains
 
 # Carrega o .env da raiz do projeto
 ROOT_DIR = Path(__file__).resolve().parents[2]
