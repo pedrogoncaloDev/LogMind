@@ -1,28 +1,34 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { login as loginRequest } from '@/services/authService'
-import type { LoginCredentials } from '@/types/auth'
+import { login as loginRequest, register as registerRequest } from '@/services/authService'
+import { tokenStorage } from '@/services/tokenStorage'
+import { decodeAuthUser } from '@/utils/jwt'
+import type { LoginCredentials, RegisterPayload } from '@/types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
-  const accessToken = ref<string | null>(localStorage.getItem('accessToken'))
-  const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'))
+	const accessToken = ref<string | null>(tokenStorage.getAccess())
+	const refreshToken = ref<string | null>(tokenStorage.getRefresh())
 
-  const isAuthenticated = computed(() => !!accessToken.value)
+	const isAuthenticated = computed(() => !!accessToken.value)
+	const user = computed(() => decodeAuthUser(accessToken.value ?? refreshToken.value))
 
-  async function login(credentials: LoginCredentials) {
-    const tokens = await loginRequest(credentials)
-    accessToken.value = tokens.access_token
-    refreshToken.value = tokens.refresh_token
-    localStorage.setItem('accessToken', tokens.access_token)
-    localStorage.setItem('refreshToken', tokens.refresh_token)
-  }
+	async function login(credentials: LoginCredentials) {
+		const tokens = await loginRequest(credentials)
+		accessToken.value = tokens.access_token
+		refreshToken.value = tokens.refresh_token
+		tokenStorage.set(tokens.access_token, tokens.refresh_token)
+	}
 
-  function logout() {
-    accessToken.value = null
-    refreshToken.value = null
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-  }
+	async function register(payload: RegisterPayload) {
+		await registerRequest(payload)
+		await login({ email: payload.email, password: payload.password })
+	}
 
-  return { accessToken, refreshToken, isAuthenticated, login, logout }
+	function logout() {
+		accessToken.value = null
+		refreshToken.value = null
+		tokenStorage.clear()
+	}
+
+	return { accessToken, refreshToken, isAuthenticated, user, login, register, logout }
 })
