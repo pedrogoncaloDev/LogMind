@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import BrandMark from './BrandMark.vue'
+import BrandMark from './BrandMark.vue';
 
-defineProps<{ title: string; subtitle: string }>()
+defineProps<{ title: string; subtitle: string }>();
 </script>
 
 <template>

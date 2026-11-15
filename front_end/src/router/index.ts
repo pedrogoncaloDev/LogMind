@@ -1,12 +1,12 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 declare module 'vue-router' {
 	interface RouteMeta {
 		/** Só usuários autenticados. */
-		requiresAuth?: boolean
+		requiresAuth?: boolean;
 		/** Só visitantes (login/cadastro): autenticados são enviados ao chat. */
-		guestOnly?: boolean
+		guestOnly?: boolean;
 	}
 }
 
@@ -42,12 +42,12 @@ const router = createRouter({
 			redirect: '/',
 		},
 	],
-})
+});
 
 router.beforeEach((to) => {
-	const auth = useAuthStore()
-	if (to.meta.requiresAuth && !auth.isAuthenticated) return { name: 'login' }
-	if (to.meta.guestOnly && auth.isAuthenticated) return { name: 'chat' }
-})
+	const auth = useAuthStore();
+	if (to.meta.requiresAuth && !auth.isAuthenticated) return { name: 'login' };
+	if (to.meta.guestOnly && auth.isAuthenticated) return { name: 'chat' };
+});
 
-export default router
+export default router;

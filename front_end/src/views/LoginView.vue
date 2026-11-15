@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import AuthLayout from '@/components/AuthLayout.vue'
-import BaseInput from '@/components/BaseInput.vue'
-import BasePasswordInput from '@/components/BasePasswordInput.vue'
-import BaseButton from '@/components/BaseButton.vue'
-import { useAuthStore } from '@/stores/auth'
-import { extractErrorMessage } from '@/utils/errors'
+import { reactive, ref } from 'vue';
+import { RouterLink, useRouter } from 'vue-router';
+import AuthLayout from '@/components/AuthLayout.vue';
+import BaseInput from '@/components/BaseInput.vue';
+import BasePasswordInput from '@/components/BasePasswordInput.vue';
+import BaseButton from '@/components/BaseButton.vue';
+import { useAuthStore } from '@/stores/auth';
+import { extractErrorMessage } from '@/utils/errors';
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-const form = reactive({ email: '', password: '' })
-const errorMessage = ref('')
-const isSubmitting = ref(false)
+const form = reactive({ email: '', password: '' });
+const errorMessage = ref('');
+const isSubmitting = ref(false);
 
 async function handleSubmit() {
-	errorMessage.value = ''
-	isSubmitting.value = true
+	errorMessage.value = '';
+	isSubmitting.value = true;
 	try {
-		await authStore.login({ email: form.email.trim(), password: form.password })
-		router.push('/')
+		await authStore.login({ email: form.email.trim(), password: form.password });
+		router.push('/');
 	} catch (error) {
-		errorMessage.value = extractErrorMessage(error, 'Não foi possível fazer login. Tente novamente.')
+		errorMessage.value = extractErrorMessage(error, 'Não foi possível fazer login. Tente novamente.');
 	} finally {
-		isSubmitting.value = false
+		isSubmitting.value = false;
 	}
 }
 </script>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import BrandMark from './BrandMark.vue'
-import type { ChatMessage } from '@/types/chat'
+import { computed } from 'vue';
+import BrandMark from './BrandMark.vue';
+import type { ChatMessage } from '@/types/chat';
 
-const props = defineProps<{ message: ChatMessage }>()
+const props = defineProps<{ message: ChatMessage }>();
 
-const isUser = computed(() => props.message.role === 'user')
+const isUser = computed(() => props.message.role === 'user');
 const time = computed(() =>
 	new Date(props.message.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-)
+);
 </script>
 
 <template>

@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { RouterLink } from 'vue-router'
-import BrandMark from './BrandMark.vue'
-import type { Chat } from '@/types/chat'
+import { computed } from 'vue';
+import { RouterLink } from 'vue-router';
+import BrandMark from './BrandMark.vue';
+import type { Chat } from '@/types/chat';
 
 const props = defineProps<{
-	chats: Chat[]
-	activeChatId?: string
-	userEmail: string
-	open: boolean
-}>()
+	chats: Chat[];
+	activeChatId?: string;
+	userEmail: string;
+	open: boolean;
+}>();
 
 const emit = defineEmits<{
-	newChat: []
-	deleteChat: [id: string]
-	logout: []
-	close: []
-}>()
+	newChat: [];
+	deleteChat: [id: string];
+	logout: [];
+	close: [];
+}>();
 
-const DAY_MS = 86_400_000
+const DAY_MS = 86_400_000;
 
 function startOfDay(date: Date): number {
-	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
 
 /** Agrupa os chats (já ordenados do mais recente) por data da última atividade. */
@@ -31,20 +31,20 @@ const groups = computed(() => {
 		{ label: 'Ontem', chats: [] },
 		{ label: 'Últimos 7 dias', chats: [] },
 		{ label: 'Mais antigos', chats: [] },
-	]
-	const today = startOfDay(new Date())
+	];
+	const today = startOfDay(new Date());
 
 	for (const chat of props.chats) {
-		const days = Math.round((today - startOfDay(new Date(chat.updatedAt))) / DAY_MS)
-		const index = days <= 0 ? 0 : days === 1 ? 1 : days <= 7 ? 2 : 3
-		buckets[index].chats.push(chat)
+		const days = Math.round((today - startOfDay(new Date(chat.updatedAt))) / DAY_MS);
+		const index = days <= 0 ? 0 : days === 1 ? 1 : days <= 7 ? 2 : 3;
+		buckets[index].chats.push(chat);
 	}
 
-	return buckets.filter((bucket) => bucket.chats.length > 0)
-})
+	return buckets.filter((bucket) => bucket.chats.length > 0);
+});
 
 function confirmDelete(chat: Chat) {
-	if (window.confirm(`Excluir o chat "${chat.title}"?`)) emit('deleteChat', chat.id)
+	if (window.confirm(`Excluir o chat "${chat.title}"?`)) emit('deleteChat', chat.id);
 }
 </script>
 

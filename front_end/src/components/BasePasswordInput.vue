@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import BaseInput from './BaseInput.vue'
+import { ref, computed } from 'vue';
+import BaseInput from './BaseInput.vue';
 
 withDefaults(
 	defineProps<{
-		modelValue?: string
-		label?: string
-		error?: string
-		id?: string
-		autocomplete?: string
+		modelValue?: string;
+		label?: string;
+		error?: string;
+		id?: string;
+		autocomplete?: string;
 	}>(),
 	{
 		modelValue: '',
 		label: 'Senha',
 		autocomplete: 'current-password',
 	},
-)
+);
 
-defineEmits<{ 'update:modelValue': [value: string] }>()
+defineEmits<{ 'update:modelValue': [value: string] }>();
 
-const visible = ref(false)
-const inputType = computed(() => (visible.value ? 'text' : 'password'))
+const visible = ref(false);
+const inputType = computed(() => (visible.value ? 'text' : 'password'));
 </script>
 
 <template>

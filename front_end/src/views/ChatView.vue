@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import ChatSidebar from '@/components/ChatSidebar.vue'
-import ChatMessageItem from '@/components/ChatMessageItem.vue'
-import BrandMark from '@/components/BrandMark.vue'
-import PromptInput from '@/components/PromptInput.vue'
-import { useAuthStore } from '@/stores/auth'
-import { useChatStore } from '@/stores/chat'
+import { computed, nextTick, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import ChatSidebar from '@/components/ChatSidebar.vue';
+import ChatMessageItem from '@/components/ChatMessageItem.vue';
+import BrandMark from '@/components/BrandMark.vue';
+import PromptInput from '@/components/PromptInput.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useChatStore } from '@/stores/chat';
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const chatStore = useChatStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+const chatStore = useChatStore();
 
 if (authStore.user) {
-	chatStore.init(authStore.user.id)
+	chatStore.init(authStore.user.id);
 } else {
 	// Token ilegível: sessão inválida.
-	authStore.logout()
-	router.replace('/login')
+	authStore.logout();
+	router.replace('/login');
 }
 
 const STARTERS = [
@@ -40,70 +40,70 @@ const STARTERS = [
 		description: 'Procure picos de latência.',
 		prompt: 'Como investigar picos de latência nestes logs?\n',
 	},
-]
+];
 
-const draft = ref('')
-const sidebarOpen = ref(false)
-const scroller = ref<HTMLElement | null>(null)
-const promptInput = ref<InstanceType<typeof PromptInput> | null>(null)
+const draft = ref('');
+const sidebarOpen = ref(false);
+const scroller = ref<HTMLElement | null>(null);
+const promptInput = ref<InstanceType<typeof PromptInput> | null>(null);
 
-const chatId = computed(() => (typeof route.params.chatId === 'string' ? route.params.chatId : undefined))
-const chat = computed(() => chatStore.getChat(chatId.value))
-const isWaitingReply = computed(() => !!chat.value && chatStore.sendingChatId === chat.value.id)
+const chatId = computed(() => (typeof route.params.chatId === 'string' ? route.params.chatId : undefined));
+const chat = computed(() => chatStore.getChat(chatId.value));
+const isWaitingReply = computed(() => !!chat.value && chatStore.sendingChatId === chat.value.id);
 
 // Link para um chat que não existe (apagado, ou de outro usuário): volta ao início.
 watch(
 	chatId,
 	(id) => {
-		if (id && !chatStore.getChat(id)) router.replace({ name: 'chat' })
+		if (id && !chatStore.getChat(id)) router.replace({ name: 'chat' });
 	},
 	{ immediate: true },
-)
+);
 
 function scrollToBottom() {
 	nextTick(() => {
-		scroller.value?.scrollTo({ top: scroller.value.scrollHeight, behavior: 'smooth' })
-	})
+		scroller.value?.scrollTo({ top: scroller.value.scrollHeight, behavior: 'smooth' });
+	});
 }
 
 watch(() => [chat.value?.id, chat.value?.messages.length, isWaitingReply.value], scrollToBottom, {
 	flush: 'post',
-})
+});
 
 async function handleSubmit() {
-	const text = draft.value.trim()
-	if (!text) return
+	const text = draft.value.trim();
+	if (!text) return;
 
-	const { chatId: usedId, reply } = chatStore.sendPrompt(text, chat.value?.id)
-	draft.value = ''
-	if (usedId !== chatId.value) router.push({ name: 'chat', params: { chatId: usedId } })
-	await reply
+	const { chatId: usedId, reply } = chatStore.sendPrompt(text, chat.value?.id);
+	draft.value = '';
+	if (usedId !== chatId.value) router.push({ name: 'chat', params: { chatId: usedId } });
+	await reply;
 }
 
 function useSuggestion(text: string) {
-	draft.value = text
+	draft.value = text;
 	nextTick(() => {
-		promptInput.value?.resize()
-		promptInput.value?.focus()
-	})
+		promptInput.value?.resize();
+		promptInput.value?.focus();
+	});
 }
 
 function newChat() {
-	sidebarOpen.value = false
-	draft.value = ''
-	router.push({ name: 'chat' })
-	nextTick(() => promptInput.value?.focus())
+	sidebarOpen.value = false;
+	draft.value = '';
+	router.push({ name: 'chat' });
+	nextTick(() => promptInput.value?.focus());
 }
 
 function handleDelete(id: string) {
-	chatStore.deleteChat(id)
-	if (id === chatId.value) router.replace({ name: 'chat' })
+	chatStore.deleteChat(id);
+	if (id === chatId.value) router.replace({ name: 'chat' });
 }
 
 function handleLogout() {
-	authStore.logout()
-	chatStore.reset()
-	router.push('/login')
+	authStore.logout();
+	chatStore.reset();
+	router.push('/login');
 }
 </script>
 

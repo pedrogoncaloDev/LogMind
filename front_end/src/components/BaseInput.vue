@@ -1,21 +1,21 @@
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 withDefaults(
 	defineProps<{
-		modelValue?: string
-		label?: string
-		type?: string
-		error?: string
-		id?: string
+		modelValue?: string;
+		label?: string;
+		type?: string;
+		error?: string;
+		id?: string;
 	}>(),
 	{
 		modelValue: '',
 		type: 'text',
 	},
-)
+);
 
-defineEmits<{ 'update:modelValue': [value: string] }>()
+defineEmits<{ 'update:modelValue': [value: string] }>();
 </script>
 
 <template>

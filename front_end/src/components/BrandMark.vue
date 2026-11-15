@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Marca do LogMind: linhas de log, com uma linha em destaque e um ponto
 // marcando o trecho que a I.A. apontou.
-withDefaults(defineProps<{ size?: number }>(), { size: 28 })
+withDefaults(defineProps<{ size?: number }>(), { size: 28 });
 </script>
 
 <template>

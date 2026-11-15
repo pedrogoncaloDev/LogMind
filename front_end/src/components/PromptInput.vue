@@ -1,48 +1,48 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue';
 
-const props = defineProps<{ disabled?: boolean; modelValue: string }>()
+const props = defineProps<{ disabled?: boolean; modelValue: string }>();
 
 const emit = defineEmits<{
-	'update:modelValue': [value: string]
-	submit: []
-}>()
+	'update:modelValue': [value: string];
+	submit: [];
+}>();
 
-const textarea = ref<HTMLTextAreaElement | null>(null)
-const MAX_HEIGHT = 200
+const textarea = ref<HTMLTextAreaElement | null>(null);
+const MAX_HEIGHT = 200;
 
 function resize() {
-	const el = textarea.value
-	if (!el) return
-	el.style.height = 'auto'
-	el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`
+	const el = textarea.value;
+	if (!el) return;
+	el.style.height = 'auto';
+	el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`;
 }
 
 function onInput(event: Event) {
-	emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
-	resize()
+	emit('update:modelValue', (event.target as HTMLTextAreaElement).value);
+	resize();
 }
 
 function trySubmit() {
-	if (props.disabled || !props.modelValue.trim()) return
-	emit('submit')
-	nextTick(resize)
+	if (props.disabled || !props.modelValue.trim()) return;
+	emit('submit');
+	nextTick(resize);
 }
 
 function onKeydown(event: KeyboardEvent) {
 	// Enter envia; Shift+Enter quebra linha. Ignora Enter durante composição (IME).
 	if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
-		event.preventDefault()
-		trySubmit()
+		event.preventDefault();
+		trySubmit();
 	}
 }
 
 function focus() {
-	textarea.value?.focus()
+	textarea.value?.focus();
 }
 
-onMounted(focus)
-defineExpose({ focus, resize })
+onMounted(focus);
+defineExpose({ focus, resize });
 </script>
 
 <template>
