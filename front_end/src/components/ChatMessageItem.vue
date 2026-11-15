@@ -1,15 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import BrandMark from './BrandMark.vue'
 import type { ChatMessage } from '@/types/chat'
 
-defineProps<{ message: ChatMessage }>()
+const props = defineProps<{ message: ChatMessage }>()
+
+const isUser = computed(() => props.message.role === 'user')
+const time = computed(() =>
+	new Date(props.message.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+)
 </script>
 
 <template>
-	<article class="message" :class="`message--${message.role}`">
-		<span class="message__marker" aria-hidden="true">{{ message.role === 'user' ? '>' : '●' }}</span>
-		<div class="message__body">
-			<span class="message__author">{{ message.role === 'user' ? 'Você' : 'LogMind' }}</span>
-			<p class="message__content">{{ message.content }}</p>
+	<article class="message" :class="isUser ? 'message--user' : 'message--assistant'">
+		<BrandMark v-if="!isUser" :size="28" class="message__avatar" />
+
+		<div class="message__main">
+			<p class="message__bubble">{{ message.content }}</p>
+			<time class="message__time" :datetime="message.createdAt">{{ isUser ? 'Você' : 'LogMind' }} · {{ time
+				}}</time>
 		</div>
 	</article>
 </template>
@@ -21,41 +30,48 @@ defineProps<{ message: ChatMessage }>()
 	align-items: flex-start;
 }
 
-.message__marker {
-	flex-shrink: 0;
-	width: 1.25rem;
-	font-family: var(--font-mono);
-	font-weight: 700;
-	line-height: 1.5;
-	color: var(--accent);
+.message--user {
+	justify-content: flex-end;
 }
 
-.message--user .message__marker {
-	color: var(--muted);
+.message__avatar {
+	margin-top: 2px;
 }
 
-.message__body {
+.message__main {
 	min-width: 0;
+	max-width: min(100%, 640px);
 	display: flex;
 	flex-direction: column;
-	gap: 0.15rem;
+	gap: 0.3rem;
 }
 
-.message__author {
-	font-size: 0.75rem;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	color: var(--muted);
+.message--user .message__main {
+	align-items: flex-end;
+	max-width: min(85%, 560px);
 }
 
-.message__content {
+.message__bubble {
+	padding: 0.7rem 0.95rem;
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	background-color: var(--surface);
 }
 
-.message--user .message__content {
-	font-family: var(--font-mono);
-	font-size: 0.92rem;
+.message--assistant .message__bubble {
+	border-top-left-radius: var(--radius-sm);
+}
+
+.message--user .message__bubble {
+	border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+	border-top-right-radius: var(--radius-sm);
+	background-color: var(--accent-soft);
+}
+
+.message__time {
+	font-size: 0.72rem;
+	color: var(--muted);
 }
 </style>
