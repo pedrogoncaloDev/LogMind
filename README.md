@@ -12,7 +12,7 @@ Plataforma de análise de logs com IA. O usuário envia arquivos `.log`, que sã
 - Armazenamento de arquivos via interface plugável (local e S3)
 - Migrations de banco com **Alembic**
 - Testes unitários e de integração com **pytest**, executados no CI a cada Pull Request
-- Frontend em Vue 3 com tela de login
+- Frontend em Vue 3 com login, cadastro e uma interface de chat (prompt + respostas, com a lista de chats na lateral). O histórico de chats fica no `localStorage` e as respostas são provisórias, até a API ganhar endpoints de chat/IA
 
 ## Stack
 
@@ -145,4 +145,5 @@ Os testes rodam automaticamente no GitHub Actions em todo Pull Request para a `m
 - [ ] Endpoints de análise (`analysis`) e de erros encontrados (`analysis_error`)
 - [ ] Integração com IA para resumo e classificação dos logs
 - [ ] Listagem e detalhes dos logs enviados no front-end
-- [ ] Telas de cadastro e dashboard
+- [ ] Endpoints de chat no back-end (hoje os chats vivem só no navegador)
+- [ ] Dashboard
