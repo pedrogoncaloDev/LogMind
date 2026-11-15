@@ -52,9 +52,20 @@ defineExpose({ focus, resize })
 			@input="onInput" @keydown="onKeydown" />
 
 		<div class="composer__bar">
-			<span class="composer__hint">
-				<kbd>Enter</kbd> envia · <kbd>Shift</kbd> + <kbd>Enter</kbd> nova linha
-			</span>
+			<div class="composer__left">
+				<button type="button" class="composer__attach" title="Anexar arquivo .log"
+					aria-label="Anexar arquivo .log">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+						stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path
+							d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+					</svg>
+				</button>
+
+				<span class="composer__hint">
+					<kbd>Enter</kbd> envia · <kbd>Shift</kbd> + <kbd>Enter</kbd> nova linha
+				</span>
+			</div>
 			<button type="submit" class="composer__send" :disabled="disabled || !modelValue.trim()">
 				Enviar
 			</button>
@@ -107,6 +118,32 @@ defineExpose({ focus, resize })
 	margin-top: 0.4rem;
 }
 
+.composer__left {
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.composer__attach {
+	flex-shrink: 0;
+	width: 2rem;
+	height: 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--muted);
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.composer__attach:hover {
+	background-color: var(--surface-hover);
+	color: var(--accent);
+}
+
 .composer__hint {
 	font-size: 0.74rem;
 	color: var(--muted);
@@ -145,10 +182,6 @@ defineExpose({ focus, resize })
 @media (max-width: 480px) {
 	.composer__hint {
 		display: none;
-	}
-
-	.composer__bar {
-		justify-content: flex-end;
 	}
 }
 </style>
