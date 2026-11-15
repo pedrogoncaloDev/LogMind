@@ -2,7 +2,7 @@
 
 Plataforma de análise de logs com IA. O usuário envia arquivos `.log`, que são armazenados e registrados para posterior análise (contagem de linhas, erros, warnings e resumo gerado por IA).
 
-> **Status:** em desenvolvimento. Autenticação e upload de logs estão funcionais; a análise com IA ainda está em construção (modelos e camadas de `analysis` / `analysis_error` já existem, mas ainda não estão expostos na API).
+> **Status:** em desenvolvimento. Autenticação e upload de logs estão funcionais; a análise com IA ainda está em construção (modelos e camadas de `analysis` / `analysis_error` já existem, mas ainda não estão expostos na API). O chat do front-end ainda não conversa com a API: o histórico fica no navegador e as respostas são provisórias.
 
 ## Funcionalidades
 
@@ -12,7 +12,10 @@ Plataforma de análise de logs com IA. O usuário envia arquivos `.log`, que sã
 - Armazenamento de arquivos via interface plugável (local e S3)
 - Migrations de banco com **Alembic**
 - Testes unitários e de integração com **pytest**, executados no CI a cada Pull Request
-- Frontend em Vue 3 com login, cadastro e uma interface de chat (prompt + respostas, com a lista de chats na lateral). O histórico de chats fica no `localStorage` e as respostas são provisórias, até a API ganhar endpoints de chat/IA
+- Front-end em Vue 3 com telas de login e cadastro, rotas protegidas e renovação automática do token
+- Interface de chat: prompt e respostas na área principal e lista de chats agrupada por data na lateral. O histórico fica no `localStorage` e as respostas são provisórias, até a API ganhar endpoints de chat/IA
+- Botão de anexo no campo de prompt para enviar arquivos `.log` (ainda sem funcionalidade)
+- Tema claro e escuro, de acordo com o sistema
 
 ## Stack
 
@@ -38,10 +41,22 @@ LogMind/
 │   │   └── main.py
 │   ├── alembic/               # migrations
 │   ├── tests/                 # unit/ e integration/
+│   ├── requirements.txt       # dependências para rodar a API
+│   ├── requirements-dev.txt   # as anteriores + dependências de teste
 │   └── Dockerfile
 ├── front_end/                 # SPA Vue 3 + Vite
+│   ├── public/                # favicon
+│   └── src/
+│       ├── components/        # AuthLayout, BrandMark, ChatSidebar, PromptInput, Base*
+│       ├── router/            # rotas e guards de autenticação
+│       ├── services/          # httpClient (Axios), authService, chatService, tokenStorage
+│       ├── stores/            # Pinia: auth e chat
+│       ├── styles/            # tokens de design (tema claro e escuro)
+│       ├── types/ e utils/    # interfaces TypeScript e funções auxiliares
+│       └── views/             # LoginView, RegisterView, ChatView
 ├── docker-compose.yml
 ├── .env.example
+├── CLAUDE.md                  # instruções para o Claude Code
 └── .github/workflows/tests.yml
 ```
 
@@ -72,6 +87,8 @@ O back-end segue uma organização por domínio, com separação em camadas (rou
    | `DEBUG_MODE` | `true` sobe a API com `debugpy` na porta 5678 |
    | `STORAGE_LOCAL_PATH` | (opcional) pasta dos uploads, padrão `storage/uploads` |
 
+O front-end tem o próprio `.env` (veja [Front-end](#front-end)). O Vite só lê o `.env` da pasta `front_end/` e só expõe ao navegador variáveis `VITE_*`, por isso ele não usa o `.env` da raiz.
+
 ## Executando com Docker
 
 ```bash
@@ -83,6 +100,8 @@ Isso sobe o PostgreSQL e a API:
 - API: http://localhost:5000
 - Documentação interativa (Swagger): http://localhost:5000/docs
 - Debug remoto (se `DEBUG_MODE=true`): porta `5678`
+
+O Compose sobe apenas o banco e a API. O front-end roda à parte (veja [Front-end](#front-end)).
 
 Aplique as migrations (dentro do container ou localmente):
 
@@ -103,6 +122,8 @@ alembic upgrade head
 uvicorn app.main:app --reload --port 5000
 ```
 
+O `requirements-dev.txt` inclui o `requirements.txt` e adiciona as dependências de teste. Para apenas rodar a API, `pip install -r requirements.txt` basta.
+
 Comandos úteis de migration:
 
 ```bash
@@ -117,9 +138,10 @@ cd front_end
 cp .env.example .env
 npm install
 npm run dev
+npm run build          # checagem de tipos e build de produção
 ```
 
-Acesse http://localhost:5173.
+Acesse http://localhost:5173. A API precisa estar no ar no endereço definido em `VITE_API_BASE_URL` (padrão `http://localhost:5000`) para o login e o cadastro funcionarem.
 
 ## Endpoints da API
 
@@ -144,6 +166,7 @@ Os testes rodam automaticamente no GitHub Actions em todo Pull Request para a `m
 
 - [ ] Endpoints de análise (`analysis`) e de erros encontrados (`analysis_error`)
 - [ ] Integração com IA para resumo e classificação dos logs
+- [ ] Upload de arquivos `.log` pelo front-end (o botão de anexo já existe, falta a funcionalidade)
 - [ ] Listagem e detalhes dos logs enviados no front-end
 - [ ] Endpoints de chat no back-end (hoje os chats vivem só no navegador)
 - [ ] Dashboard
